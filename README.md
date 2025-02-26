@@ -1,4 +1,4 @@
-# Host scanner
+# Reverse backdoor
 
 These scripts makes some crazy stuff :)
 
