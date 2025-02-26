@@ -29,14 +29,18 @@ class Listener:
                 continue
     
     def execute_remotely(self, command):
-        # Method which sending and receiving data
+        # Method which sending, receiving data and exiting program
         self.reliable_send(command)
+        if command[0] == 'exit':
+            self.connection.close()
+            exit()
         return self.reliable_receive()
 
     def run(self):
         # Method which run everythong - receiving, sendin, executing, etc.
         while True:
             command = input('>> ')
+            command = command.split(" ")
             result = self.execute_remotely(command)
             print(result)
 
