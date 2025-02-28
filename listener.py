@@ -15,7 +15,7 @@ class Listener:
 
     def reliable_send(self, data):
         # Safety way to send data as json
-        json_data = json.dumps(base64.b64encode(json.dumps(data).encode()).decode())
+        json_data = json.dumps(data)
         self.connection.send(json_data.encode())
 
     def reliable_receive(self):
@@ -24,7 +24,7 @@ class Listener:
         while True:
             try:
                 json_data += self.connection.recv(1024).decode()
-                return json.loads(base64.b64decode(json.loads(json_data)).decode())
+                return json.loads(json_data)
             except ValueError:
                 continue
 

