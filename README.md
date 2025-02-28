@@ -4,6 +4,8 @@ These scripts makes some crazy stuff :)
 
 ## Features
 - Executes on the victim's device commands and (optionaly) send result
+- Uploading files to the victim's device
+- Downloading files from the victim's device
 
 ## Table of Contents
 
