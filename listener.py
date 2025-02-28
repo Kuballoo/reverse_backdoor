@@ -39,7 +39,7 @@ class Listener:
     def write_file(self, file_path, file_data):
         # Method writing data to file
         with open(file_path, 'wb') as file:
-            file.write(file_data)
+            file.write(base64.b64decode(file_data))
             return '[+] Download successful.'
 
     def run(self):

